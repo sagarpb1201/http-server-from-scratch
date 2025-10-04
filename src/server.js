@@ -36,20 +36,10 @@ class HTTPServer{
             socket.on('data',(chunk)=>{
                 const request=chunk.toString();
 
-                // console.log("Recieved chunk",chunk.toString());
-
                 const parsedRequest=request.split('\r\n');
-
-                // console.log('parsed request',parsedRequest);
 
                 const firstLine=parsedRequest[0].split(' ');
                 const method=firstLine[0];
-                const path=firstLine[1];
-
-                // console.log('first line',firstLine);
-                // console.log("Method:",method);
-                // console.log("Path:",path);
-                // console.log("HTTP version:",firstLine[2]);
 
                 const route=this.routes.find(route=>{
                     return route.method===method && route.path===path
@@ -65,12 +55,6 @@ class HTTPServer{
                 }
 
                 socket.end();
-
-                // socket.write('HTTP/1.1 200 OK\r\n');
-                // socket.write('Content-Type: text/plain\r\n')
-                // socket.write('\r\n');
-                // socket.write(`You requested ${path} using ${method}`);
-                // socket.end();
             });
         });
 
