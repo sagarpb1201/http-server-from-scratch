@@ -18,12 +18,19 @@ server.get('/products',(req,res)=>{
 
 server.post('/users',(req,res)=>{
     console.log('Recieved body:',req.body);
-    console.log('Headers:',req.headers);
+    console.log('Body type:',typeof req.body)
 
-    res.status(201).json({
-        message:'User created',
-        body:req.body
-    });
+    if(req.body && typeof req.body==='object'){
+        const {name,age}=req.body;
+        res.status(201).json({
+            message:'User created',
+            body:{name,age}
+        });
+    }else{
+        res.status(400).json({
+            error:'Invalid JSON body'
+        })
+    }
 });
 
 server.listen(3000);
