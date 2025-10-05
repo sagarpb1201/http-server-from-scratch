@@ -1,4 +1,6 @@
 const net=require('net');
+const Response=require('./response');
+const Request=require('./request');
 
 class HTTPServer{
     constructor(){
@@ -35,23 +37,39 @@ class HTTPServer{
         const server=net.createServer((socket)=>{
             socket.on('data',(chunk)=>{
                 const request=chunk.toString();
-
                 const parsedRequest=request.split('\r\n');
 
                 const firstLine=parsedRequest[0].split(' ');
                 const method=firstLine[0];
+                const path=firstLine[1];
+
+                const headers={};
+                let i=1;
+                for(;i<parsedRequest.length;i++){
+                    const line=parsedRequest[i];
+                    if(line==='') break;
+                    const colonIndex=line.indexOf(':');
+                    if(colonIndex>0){
+                        const key=line.slice(0,colonIndex).toLowerCase();
+                        const value=line.slice(colonIndex+1).trim();
+                        headers[key]=value;
+                    }
+                }
+
+                const bodyLines=parsedRequest.slice(i+1);
+                const body=bodyLines.join('\r\n');
+
+                const req=new Request(method,path,headers,body);
+                const res=new Response(socket);
 
                 const route=this.routes.find(route=>{
-                    return route.method===method && route.path===path
+                    return route.method===method && route.path===req.path
                 });
 
                 if(route){
-                    const response=route.handler();
-                    socket.write('HTTP/1.1 200 OK\r\n\r\n');
-                    socket.write(response);
+                    route.handler(req,res);
                 }else{
-                    socket.write('HTTP/1.1 404 Not Found\r\n\r\n');
-                    socket.write('Route not found');
+                    res.status(400).json({error:'Route not found'});
                 }
 
                 socket.end();
