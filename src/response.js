@@ -19,6 +19,7 @@ class Response{
     }
 
     send(body){
+        if (this.timer) clearTimeout(this.timer);
         this.socket.write(`HTTP/1.1 ${this.statusCode} OK\r\n`);
         for(const [key,value] of Object.entries(this.headers)){
             this.socket.write(`${key}: ${value}\r\n`);

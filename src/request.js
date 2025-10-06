@@ -18,10 +18,10 @@ class Request {
     } else {
       this.path = path;
     }
-    this.body = this.bodyParaser(body);
+    this.body = this.bodyParser(body);
   }
 
-  bodyParaser(body) {
+  bodyParser(body) {
     if (!body || body.trim() === "") {
       return null;
     }
